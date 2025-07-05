@@ -1,0 +1,9 @@
+application:
+  yaml:
+server:
+  port: 8091
+
+logging:
+  level:
+    root: info
+  config: classpath:logback-spring.xml
