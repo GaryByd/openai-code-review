@@ -3,15 +3,24 @@ package com.luojiawei.sdk;
 import com.alibaba.fastjson2.JSON;
 import com.luojiawei.sdk.domain.model.ChatCompletionRequest;
 import com.luojiawei.sdk.domain.model.ChatCompletionSyncResponse;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class OpenAiCodeReview {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, GitAPIException {
         System.out.println("Hello OpenAI Code Review SDK!");
+        String token = System.getenv("GITHUB_TOKEN");
+        if(null == token || token.isEmpty()){
+            throw new RuntimeException("token is null");
+        }
 
         // 1.代码检出
         ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "HEAD~1", "HEAD");
@@ -34,6 +43,9 @@ public class OpenAiCodeReview {
         String log = codeReview(diffCode.toString());
 
         System.out.println("code codeReview"+log);
+
+        // 3.将日志写入到github
+        writeLog(token, log);
 
     }
     public static String codeReview(String code) throws IOException {
@@ -88,5 +100,34 @@ public class OpenAiCodeReview {
 
         ChatCompletionSyncResponse chatCompletionSyncResponse = JSON.parseObject(content.toString(), ChatCompletionSyncResponse.class);
         return chatCompletionSyncResponse.getChoices().get(0).getMessage().getContent();
+    }
+
+    private static String writeLog(String token,String log) throws GitAPIException {
+        Git git = Git.cloneRepository()
+                .setURI("https://github.com/GaryByd/openai-code-review-log")
+                .setDirectory(new File("repo"))
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(token, ""))
+                .call();
+
+        String dataFolderName = new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
+        File dataFolder = new File("repo/" + dataFolderName);
+        if(!dataFolder.exists()) {
+            dataFolder.mkdirs();
+        }
+
+        UUID uuid = UUID.randomUUID();
+        String fileName = uuid.toString() + ".md";
+        File newFile = new File(dataFolder, fileName);
+        try(FileWriter writer = new FileWriter(newFile)) {
+            writer.write(log);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        git.add().addFilepattern(dataFolderName + "/" + fileName).call();
+        git.commit().setMessage("Add log file: " + fileName).call();
+        git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(token, "")).call();
+
+        // 这里可以实现将日志写入到指定的文件或数据库中
+        return "https://github.com/GaryByd/openai-code-review-log/blob/master/"+dataFolderName+ "/" + fileName;
     }
 }
