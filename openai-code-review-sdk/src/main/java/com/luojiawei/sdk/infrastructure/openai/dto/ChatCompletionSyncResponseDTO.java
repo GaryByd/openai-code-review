@@ -1,8 +1,8 @@
-package com.luojiawei.sdk.domain.model;
+package com.luojiawei.sdk.infrastructure.openai.dto;
 
 import java.util.List;
 
-public class ChatCompletionSyncResponse {
+public class ChatCompletionSyncResponseDTO {
 
     private List<Choice> choices;
 

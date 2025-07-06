@@ -1,7 +1,9 @@
-package com.luojiawei.sdk.domain.model;
+package com.luojiawei.sdk.infrastructure.openai.dto;
+import com.luojiawei.sdk.domain.model.Model;
+
 import java.util.List;
 
-public class ChatCompletionRequest {
+public class ChatCompletionRequestDTO {
 
     private String model = Model.GLM_4_FLASH.getCode();
     private List<Prompt> messages;
