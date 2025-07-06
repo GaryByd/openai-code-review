@@ -1,6 +1,6 @@
 package com.luojiawei.sdk.domain.model;
 public enum Model {
-    DEFAUT_MODEL("deepseek/deepseek-v3-0324", "适用于对知识量、推理能力、创造力要求较高的场景"),
+    DEFAULT_MODEL("deepseek/deepseek-v3-0324", "适用于对知识量、推理能力、创造力要求较高的场景"),
     @Deprecated
     CHATGLM_6B_SSE("chatGLM_6b_SSE", "ChatGLM-6B 测试模型"),
     @Deprecated
