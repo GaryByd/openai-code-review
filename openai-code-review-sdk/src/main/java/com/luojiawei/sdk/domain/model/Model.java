@@ -1,7 +1,6 @@
 package com.luojiawei.sdk.domain.model;
-
 public enum Model {
-
+    DEFAUT_MODEL("deepseek/deepseek-v3-0324", "适用于对知识量、推理能力、创造力要求较高的场景"),
     @Deprecated
     CHATGLM_6B_SSE("chatGLM_6b_SSE", "ChatGLM-6B 测试模型"),
     @Deprecated
@@ -20,7 +19,9 @@ public enum Model {
     GLM_4V("glm-4v","根据输入的自然语言指令和图像信息完成任务，推荐使用 SSE 或同步调用方式请求接口"),
     GLM_4_FLASH("glm-4-flash","适用简单任务，速度最快，价格最实惠的版本，具有128k上下文"),
     COGVIEW_3("cogview-3","根据用户的文字描述生成图像,使用同步调用方式请求接口"),
+    //默认使用的这个模型
     DEEPSEEK_3("deepseek/deepseek-v3-0324", "适用于对知识量、推理能力、创造力要求较高的场景"),
+
     ;
     private final String code;
     private final String info;

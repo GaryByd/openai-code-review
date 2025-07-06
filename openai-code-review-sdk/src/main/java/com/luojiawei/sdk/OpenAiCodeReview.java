@@ -32,6 +32,8 @@ public class OpenAiCodeReview {
     private String github_branch;
     private String github_author;
 
+    public static String default_model;
+
     public static void main(String[] args) throws Exception {
         GitCommand gitCommand = new GitCommand(
                 getEnv("GITHUB_REVIEW_LOG_URI"),
@@ -52,6 +54,8 @@ public class OpenAiCodeReview {
                 getEnv("WEIXIN_TEMPLATE_ID")
         );
         IOpenAI openAI = new ChatGLM(getEnv("CHATGLM_APIHOST"), getEnv("CHATGLM_APIKEYSECRET"));
+        // 设置默认模型
+        OpenAiCodeReview.default_model = getEnv("DEFAULT_MODEL");
         OpenAiCodeReviewService openAiCodeReviewService = new OpenAiCodeReviewService(gitCommand, openAI, weiXin);
         openAiCodeReviewService.exec();
         logger.info("openai-code-review done!");
