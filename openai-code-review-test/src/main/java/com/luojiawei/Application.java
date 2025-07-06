@@ -5,6 +5,6 @@ import org.junit.Test;
 public class Application {
     @Test
     public void test(){
-        System.out.println("12341234567890");
+        System.out.println("12341234512312367890");
     }
 }
