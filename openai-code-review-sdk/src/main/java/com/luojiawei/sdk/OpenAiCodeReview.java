@@ -45,7 +45,8 @@ public class OpenAiCodeReview {
         System.out.println("code codeReview"+log);
 
         // 3.将日志写入到github
-        writeLog(token, log);
+        String logUrl = writeLog(token, log);
+        System.out.println(logUrl);
 
     }
     public static String codeReview(String code) throws IOException {
@@ -104,7 +105,7 @@ public class OpenAiCodeReview {
 
     private static String writeLog(String token,String log) throws GitAPIException {
         Git git = Git.cloneRepository()
-                .setURI("https://github.com/GaryByd/openai-code-review-log")
+                .setURI("https://github.com/GaryByd/openai-code-review-log.git")
                 .setDirectory(new File("repo"))
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(token, ""))
                 .call();
