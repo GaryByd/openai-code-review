@@ -1,9 +1,11 @@
 package com.luojiawei.sdk;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.alibaba.fastjson2.JSON;
+import com.luojiawei.sdk.domain.model.ChatCompletionSyncResponse;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class OpenAiCodeReview {
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -25,7 +27,57 @@ public class OpenAiCodeReview {
 
         int exitCode = process.waitFor();
         System.out.println("Exited with code: " + exitCode);
-        System.out.println("评审代码: " + diffCode.toString());
-        // 2.调用OpenAI API进行代码评审
+        System.out.println("diff code: " + diffCode.toString());
+        // 2.调用chatglm
+        String log = codeReview(diffCode.toString());
+
+        System.out.println("code codeReview"+log);
+
+    }
+    public static String codeReview(String code) throws IOException {
+        String apiKeySecret = "sk_aDjk0JmtHCg9FZgiURtgKSKy9cxz3WD9OVflhg43-qQ";
+
+        URL url = new URL("https://api.ppinfra.com/v3/openai/chat/completions");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", "Bearer " + apiKeySecret);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3");
+        // 设置连接超时和读取超时
+        connection.setDoOutput(true);
+        String jsonInpuString = "{"
+                + "\"model\":\"deepseek/deepseek-v3-0324\","
+                + "\"messages\": ["
+                + "    {"
+                + "        \"role\": \"user\","
+                + "        \"content\": \"你是一个高级编程架构师，精通各类场景方案、架构设计和编程语言请，请您根据git diff记录，对代码做出评审。代码为: " + code + "\""
+                + "    }"
+                + "]"
+                + "}";
+
+        try(OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonInpuString.getBytes("utf-8");
+            os.write(input);
+        }
+
+        int responseCode = connection.getResponseCode();
+        System.out.println(responseCode);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+
+        StringBuilder content = new StringBuilder();
+
+        while((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+        connection.disconnect();
+
+        System.out.println(content.toString());
+
+        ChatCompletionSyncResponse chatCompletionSyncResponse = JSON.parseObject(content.toString(), ChatCompletionSyncResponse.class);
+        return chatCompletionSyncResponse.getChoices().get(0).getMessage().getContent();
     }
 }
