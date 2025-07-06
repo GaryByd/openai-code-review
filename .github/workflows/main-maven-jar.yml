@@ -28,7 +28,7 @@ jobs:
         run: mvn clean install
 
       - name: Copy openai-code-review-sdk JAR
-        run: mvn dependency:copy -Dartifact=plus.gaga.middleware:openai-code-review-sdk:1.0 -DoutputDirectory=./libs
+        run: mvn dependency:copy -Dartifact=com.luojiawei:openai-code-review-sdk:1.0 -DoutputDirectory=./libs
 
       - name: Get repository name
         id: repo-name
