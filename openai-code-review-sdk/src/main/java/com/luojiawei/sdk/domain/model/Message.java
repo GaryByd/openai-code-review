@@ -5,15 +5,14 @@ import java.util.Map;
 
 public class Message {
 
-    private String touser = "or0Ab6ivwmypESVp_bYuk92T6SvU";
-    private String template_id = "GLlAM-Q4jdgsktdNd35hnEbHVam2mwsW2YWuxDhpQkU";
-    private String url = "https://weixin.qq.com";
+    private String touser = "o7Rw_vq2r5YUtH2zsJlyqvty4aMA";
+    private String template_id = "dJEtVyeZuMDzdstjzdv6sKylDnAE0awqN4ODJFNNgsI";
+    private String url = "https://github.com/GaryByd/openai-code-review-log/blob/main/2025-07-06/1324bfa1-e72b-484a-b6e1-f1c3fe405572.md";
     private Map<String, Map<String, String>> data = new HashMap<>();
 
     public void put(String key, String value) {
         data.put(key, new HashMap<String, String>() {
             private static final long serialVersionUID = 7092338402387318563L;
-
             {
                 put("value", value);
             }

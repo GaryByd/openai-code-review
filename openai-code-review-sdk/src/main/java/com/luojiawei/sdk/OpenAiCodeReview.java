@@ -3,6 +3,8 @@ package com.luojiawei.sdk;
 import com.alibaba.fastjson2.JSON;
 import com.luojiawei.sdk.domain.model.ChatCompletionRequest;
 import com.luojiawei.sdk.domain.model.ChatCompletionSyncResponse;
+import com.luojiawei.sdk.domain.model.Message;
+import com.luojiawei.sdk.types.utils.WXAccessTokenUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -10,8 +12,10 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class OpenAiCodeReview {
@@ -48,8 +52,44 @@ public class OpenAiCodeReview {
         String logUrl = writeLog(token, log);
         System.out.println(logUrl);
 
+        // 4.发送微信通知
+        pushMessage(logUrl);
+
     }
-    public static String codeReview(String code) throws IOException {
+
+    private static void pushMessage(String logUrl){
+        String accessToken = WXAccessTokenUtils.getAccessToken();
+        Message message = new Message();
+        message.put("project","OpenAI Code Review");
+        message.put("review",logUrl);
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s", accessToken);
+        sendPostRequest(url,JSON.toJSONString(message));
+    }
+
+    private static void sendPostRequest(String urlString, String jsonBody) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            try (Scanner scanner = new Scanner(conn.getInputStream(), StandardCharsets.UTF_8.name())) {
+                String response = scanner.useDelimiter("\\A").next();
+                System.out.println(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String codeReview(String code) throws IOException {
         String apiKeySecret = "sk_aDjk0JmtHCg9FZgiURtgKSKy9cxz3WD9OVflhg43-qQ";
 
         URL url = new URL("https://api.ppinfra.com/v3/openai/chat/completions");
