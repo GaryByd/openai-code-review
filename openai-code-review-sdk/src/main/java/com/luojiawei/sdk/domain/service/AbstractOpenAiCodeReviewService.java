@@ -3,10 +3,11 @@ package com.luojiawei.sdk.domain.service;
 import com.luojiawei.sdk.infrastructure.git.GitCommand;
 import com.luojiawei.sdk.infrastructure.openai.IOpenAI;
 import com.luojiawei.sdk.infrastructure.weixin.WeiXin;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+
 
 public abstract class AbstractOpenAiCodeReviewService implements IOpenAiCodeReviewService {
     private final Logger logger = (Logger) LoggerFactory.getLogger(AbstractOpenAiCodeReviewService.class);
