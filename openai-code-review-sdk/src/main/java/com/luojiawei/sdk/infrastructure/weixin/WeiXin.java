@@ -34,8 +34,11 @@ public class WeiXin {
     }
 
     public void sendTemplateMessage(String logUrl, Map<String, Map<String, String>> data) throws Exception {
+        // 输出appid
+        logger.info("openai-code-review weixin appid: {}", appid);
+        // 输出accessToken
+        logger.info("openai-code-review weixin secret: {}", secret);
         String accessToken = WXAccessTokenUtils.getAccessToken(appid, secret);
-
         TemplateMessageDTO templateMessageDTO = new TemplateMessageDTO(touser, template_id);
         templateMessageDTO.setUrl(logUrl);
         templateMessageDTO.setData(data);
