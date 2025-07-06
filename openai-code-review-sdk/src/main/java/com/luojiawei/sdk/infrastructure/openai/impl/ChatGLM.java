@@ -6,6 +6,7 @@ import com.luojiawei.sdk.infrastructure.openai.dto.ChatCompletionRequestDTO;
 import com.luojiawei.sdk.infrastructure.openai.dto.ChatCompletionSyncResponseDTO;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -24,7 +25,6 @@ public class ChatGLM implements IOpenAI {
 
     @Override
     public ChatCompletionSyncResponseDTO completions(ChatCompletionRequestDTO requestDTO) throws Exception {
-
         URL url = new URL(apiHost);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -38,17 +38,27 @@ public class ChatGLM implements IOpenAI {
             os.write(input, 0, input.length);
         }
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
+        try {
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.err.println("[ChatGLM] 请求失败，URL: " + apiHost + ", 响应码: " + responseCode);
+                System.err.println("响应信息: " + connection.getResponseMessage());
+                throw new RuntimeException("[ChatGLM] 请求失败，响应码: " + responseCode + ", 响应信息: " + connection.getResponseMessage());
+            }
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+
+            return JSON.parseObject(content.toString(), ChatCompletionSyncResponseDTO.class);
+        } catch (FileNotFoundException e) {
+            System.err.println("[ChatGLM] FileNotFoundException，URL: " + apiHost);
+            e.printStackTrace();
+            throw e;
         }
-
-        in.close();
-        connection.disconnect();
-
-        return JSON.parseObject(content.toString(), ChatCompletionSyncResponseDTO.class);
     }
 
 }

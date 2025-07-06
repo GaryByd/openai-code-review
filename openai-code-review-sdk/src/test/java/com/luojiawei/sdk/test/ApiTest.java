@@ -21,12 +21,19 @@ import java.util.Scanner;
 @Slf4j
 @RunWith(SpringRunner.class)
 public class ApiTest {
+
     public static void main(String[] args) {
 //        String apiKeySecret = "sk_aDjk0JmtHCg9FZgiURtgKSKy9cxz3WD9OVflhg43-qQ";
 //        String token = BearerTokenUtils.getToken(apiKeySecret);
 //        System.out.println(token);
 
     }
+
+    @Test
+    public void test_exec() {
+
+    }
+
 
 //    @Test
 //    public void test_http() throws IOException {
